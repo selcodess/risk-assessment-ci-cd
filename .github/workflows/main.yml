@@ -1,0 +1,55 @@
+
+name: Python CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test Python Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run automated tests
+        run: |
+          python -m pytest tests/ -v
+
+  delivery:
+    name: Package Application
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create delivery package
+        run: |
+          mkdir -p dist
+          zip dist/risk-assessment.zip risk.py README.md
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: risk-assessment-package
+          path: dist/risk-assessment.zip
