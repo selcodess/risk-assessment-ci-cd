@@ -1,0 +1,33 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: risk-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: risk-assistant
+  template:
+    metadata:
+      labels:
+        app: risk-assistant
+    spec:
+      containers:
+        - name: risk-assistant
+          image: swisscom-risk-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8501
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: risk-assistant
+spec:
+  selector:
+    app: risk-assistant
+  ports:
+    - port: 8501
+      targetPort: 8501
+  type: ClusterIP
